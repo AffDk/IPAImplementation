@@ -1,5 +1,6 @@
 function WrpIPA
 
+% testing git functions
 clc; clear; close all;
 SbFldr='C:\Users\afsamani\OneDrive - Aalborg Universitet\WrokResults\Students\Fall2020\S6';
 DtFil1=fullfile(SbFldr,'OutputMat1.mat');
