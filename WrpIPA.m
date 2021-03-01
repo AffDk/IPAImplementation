@@ -1,10 +1,12 @@
 function WrpIPA
 
+% within the BetweenBreaks
 clc; clear; close all;
 SbFldr='C:\Users\afsamani\OneDrive - Aalborg Universitet\WrokResults\Students\Fall2020\S6';
 DtFil1=fullfile(SbFldr,'OutputMat1.mat');
 DtFil12=fullfile(SbFldr,'OutputMat2.mat'); % 'OutVrbFx','VrbNmsFx','DtPupil','GzDt','BlnkDt'
 
+DtStrctGm=load(DtFil1);
 DtStrct=load(DtFil12);
 
 DtPupil=DtStrct.DtPupil;
@@ -28,19 +30,30 @@ TmBlnk=BlnkDt.start_timestamp;
 DurBlnk=BlnkDt.duration;
 BlnkStr=TmBlnk-0.2;  BlnkStp=TmBlnk+DurBlnk+0.2;
 
-[PplFxStrInd0,MnVlStr]=FixGzInd(TmPupil0,FixStr);
-[PplFxStpInd0,MnVlStp]=FixGzInd(TmPupil0,FixStp);
+% [PplFxStrInd0,MnVlStr]=FixGzInd(TmPupil0,FixStr);
+% [PplFxStpInd0,MnVlStp]=FixGzInd(TmPupil0,FixStp);
 
 PupilDiam=DtPupil.diameter_3d;
 PupilDiam(CnfPup<0.6)=nan;
 PupilDiam0=PupilDiam(EyId==0);
 PupilDiam1=PupilDiam(EyId==1);
 
-FxLn=length(PplFxStrInd0);
-OutTtl=nan(1,FxLn); IPACnt=0;
-for Cnt=1:FxLn
-    X=PupilDiam0(PplFxStrInd0(Cnt):PplFxStpInd0(Cnt));
-    TmP=TmPupil0(PplFxStrInd0(Cnt):PplFxStpInd0(Cnt));
+Evnts=DtStrctGm.OutVrbGmEvnt.Event; PplTmClEvnt=str2double(string(DtStrctGm.OutVrbGmEvnt.PupilTime));
+StrMolLoc=(Evnts=='Mole Spawned');
+
+
+SpwnTm=PplTmClEvnt(StrMolLoc);
+IdKssTm=FndGpSpwn(SpwnTm);
+
+VrTm=[min(TmPupil0); IdKssTm; max(TmPupil0)+0.001];
+SgNm=length(VrTm);
+
+% FxLn=length(PplFxStrInd0);
+OutTtl=nan(1,SgNm); IPACnt=0;
+for Cnt=1:SgNm-1
+    Inx=(TmPupil0>=VrTm(Cnt) & TmPupil0<VrTm(Cnt+1));
+    X=PupilDiam0(Inx);
+    TmP=TmPupil0(Inx);
     
     Ind=(TmP(1)<=BlnkStr & TmP(end)>=BlnkStp);
     
@@ -63,6 +76,15 @@ for Cnt=1:FxLn
 end
 OutTtl(IPACnt+1:end)=[];
 alaki=0;
+
+
+function TmOut=FndGpSpwn(X)
+
+Xn=[X(1); X];
+Dx=diff(Xn);
+% Id=find(Dx>9);
+
+TmOut=X(Dx>9);
 
 
 function [GzFxInd,PgMnVl]=FixGzInd(ZrTm,FxTms)
