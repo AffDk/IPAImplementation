@@ -56,8 +56,11 @@ for Cnt=1:SgNm-1
     TmP=TmPupil0(Inx);
     
     Ind=(TmP(1)<=BlnkStr & TmP(end)>=BlnkStp);
- 
+    
+    
+    
     if any(Ind)
+        
         CvrdBlnks=BlnkStr(Ind); CvrdBlnksStp=BlnkStp(Ind);
         for BlnkCnt=1:length(CvrdBlnks)
             InxIn=(TmP>CvrdBlnks(BlnkCnt) & TmP<CvrdBlnksStp(BlnkCnt));
@@ -74,8 +77,7 @@ for Cnt=1:SgNm-1
     Xnw=interp1(TmP,X,NwTmVct,'linear','extrap');
     IndNn=isnan(Xnw);
     Xnw(IndNn)=[];
-    Xnw=Xnw(fix(0.25*Fs):end-fix(0.25*Fs)); %removing any transient
-    IPAout=IPA_measure(Xnw,Fs,Dur-0.5); % -0.5 to account for transient removal
+    IPAout=IPA_measure(Xnw,Fs,Dur);
     OutTtl(IPACnt)=IPAout;
     
 end
